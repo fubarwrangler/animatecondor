@@ -1,0 +1,73 @@
+{% import 'macros.html' as macros %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{ macros.css('vendor/bootstrap-3.3.5.min.css') }}
+  {{ macros.css('vendor/bootstrap-theme-3.3.5.min.css') }}
+  {{ macros.css('vendor/bootstrap-switch-3.3.2.min.css') }}
+
+  {{ macros.js ('vendor/jquery-2.1.4.min.js') }}
+  {{ macros.js ('vendor/bootstrap-3.3.5.min.js') }}
+  {{ macros.js ('vendor/bootstrap-switch-3.3.2.min.js') }}
+
+  {{ macros.css('awesome-bootstrap-checkbox.css') }}
+  {{ macros.css('style.css') }}
+  <script type="text/javascript">
+    var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  </script>
+  {%- block extraheaders %}{% endblock %}
+  <title>{{ config['APP_NAME'] }} Group Quotas</title>
+</head>
+<body>
+{%- block navbar %}{%- endblock %}
+<div id="flashes">
+{%- with messages = get_flashed_messages(True) %}
+  {% if messages -%}
+    {% for cat, message in messages -%}
+    {% if cat == "message" %}
+        <div class="alert alert-success flash closeme">
+    {% elif cat == "nochange" %}
+        <div class="alert alert-info flash closeme">
+    {% elif cat == "stay" %}
+        <div class="alert alert-info flash">
+    {% elif cat == "error" %}
+        <div class="alert alert-danger flash">
+    {% elif cat == "tmperror" %}
+        <div class="alert alert-danger flash closeme">
+    {% endif -%}
+     {{message}}
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    </div>
+    {% endfor -%}
+  <script>
+    $(".closeme").delay(2500).fadeOut(200, function() {
+      $(this).alert('close');
+    });
+  </script>
+  {% endif -%}
+{%- endwith %}
+</div>
+<div id="mainContent">
+{%- block body %}{%- endblock %}
+</div>
+<div id="user">
+
+    {%- if g.user == 'anonymous' -%}
+    Not Logged In
+    {%- else -%}
+    ({{ config['APP_NAME'] }}) &mdash;
+    Logged in as <i><mark>{{ g.user }}</mark></i>
+    {%- endif %}
+    {%- if session.get('active') != 1%}
+    <span class="glyphicon glyphicon-warning-sign text-danger"></span> Inactive
+    {%- else -%}
+    <span class="glyphicon glyphicon-ok-sign text-success"></span>
+    {%- endif %}
+    (<a href="{{url_for('logout', target=request.script_root + request.path)}}">refresh</a>)
+</div>
+{%- block endjs %}{%- endblock %}
+</body>
+</html>
