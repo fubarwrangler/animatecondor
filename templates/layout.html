@@ -7,19 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {{ macros.css('vendor/bootstrap-3.3.5.min.css') }}
   {{ macros.css('vendor/bootstrap-theme-3.3.5.min.css') }}
-  {{ macros.css('vendor/bootstrap-switch-3.3.2.min.css') }}
 
   {{ macros.js ('vendor/jquery-2.1.4.min.js') }}
   {{ macros.js ('vendor/bootstrap-3.3.5.min.js') }}
-  {{ macros.js ('vendor/bootstrap-switch-3.3.2.min.js') }}
 
-  {{ macros.css('awesome-bootstrap-checkbox.css') }}
   {{ macros.css('style.css') }}
   <script type="text/javascript">
     var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
   </script>
   {%- block extraheaders %}{% endblock %}
-  <title>{{ config['APP_NAME'] }} Group Quotas</title>
+  <title>HTCondor Map Activity</title>
 </head>
 <body>
 {%- block navbar %}{%- endblock %}
@@ -52,21 +49,6 @@
 </div>
 <div id="mainContent">
 {%- block body %}{%- endblock %}
-</div>
-<div id="user">
-
-    {%- if g.user == 'anonymous' -%}
-    Not Logged In
-    {%- else -%}
-    ({{ config['APP_NAME'] }}) &mdash;
-    Logged in as <i><mark>{{ g.user }}</mark></i>
-    {%- endif %}
-    {%- if session.get('active') != 1%}
-    <span class="glyphicon glyphicon-warning-sign text-danger"></span> Inactive
-    {%- else -%}
-    <span class="glyphicon glyphicon-ok-sign text-success"></span>
-    {%- endif %}
-    (<a href="{{url_for('logout', target=request.script_root + request.path)}}">refresh</a>)
 </div>
 {%- block endjs %}{%- endblock %}
 </body>

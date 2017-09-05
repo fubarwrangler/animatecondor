@@ -1,0 +1,23 @@
+{% macro navbar() %}
+<ol class="breadcrumb">
+{%- for name, link in varargs -%}
+  {% if not loop.last %}
+  <li><a href="{{url_for(link)}}">{{name}}</a></li>
+  {%- else -%}
+  <li class="active">{{name}}</li>
+  {%- endif -%}
+{% endfor %}
+</ol>
+{%- endmacro %}
+
+{%- macro css(path) -%}
+<link href="{{ _static_link(path, 'css') }}" rel="stylesheet">
+{%- endmacro %}
+
+{%- macro js(path) -%}
+<script src="{{ _static_link(path, 'js') }}"></script>
+{%- endmacro %}
+
+{%- macro _static_link(path, prefix) -%}
+{{ url_for('static', filename="%s/%s"|format(prefix, path)) }}
+{%- endmacro %}

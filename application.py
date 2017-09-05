@@ -8,9 +8,7 @@ app = Flask(__name__)
 
 app.config.from_object(__name__)
 
-
-import views
-
+import views  # noqa
 
 
 @app.errorhandler(404)
