@@ -4,5 +4,5 @@
 {%- endblock %}
 {% block body %}
 <h1> Hello! </h1>
-<object id="map" data="/static/facility.svg" type="image/svg+xml"></object>
+<object id="map" data="{{ url_for('static', filename='facility.svg')}}" type="image/svg+xml"></object>
 {% endblock %}
