@@ -6,18 +6,26 @@ function findMap() {
         theMap = document.getElementById("map").contentDocument.documentElement;
 }
 
+function randInt(min, max)  {
+    return Math.floor((Math.random() * max) + min);
+}
+
 $.fn.exists = function () {
     return this.length !== 0;
 };
 
-function createCircle (experiment, dx, dy) {
+function createCircle (experiment, x, y, dx, dy, dt) {
   var circle = document.createElementNS(svgns, 'circle');
-  circle.setAttributeNS(null, 'cx', 50);
-  circle.setAttributeNS(null, 'cy', 30);
-  circle.setAttributeNS(null, 'r', 10);
-  circle.setAttributeNS(null, 'class', 'job');
-  circle.setAttributeNS(null, 'style', 'fill: none; stroke: blue; stroke-width: 3px;' );
+  circle.setAttributeNS(null, 'cx', x);
+  circle.setAttributeNS(null, 'cy', y);
+  circle.setAttributeNS(null, 'r', 8);
+  circle.setAttributeNS(null, 'to_x', dx);
+  circle.setAttributeNS(null, 'to_y', dy);
+  circle.setAttributeNS(null, 'wait', dt);
+  circle.setAttributeNS(null, 'class', "job " + experiment);
+  circle.setAttributeNS(null, 'fill', 'blue' );
   theMap.appendChild(circle);
+  return circle;
 }
 
 function animateCircle() {
@@ -25,9 +33,23 @@ function animateCircle() {
 }
 
 function doAnimation(d) {
-    console.log(d);
+    var circs = [];
+    function mkTime(time)   {
+        return time * 10;
+    }
+    //createCircle('star', randInt(10, 50), randInt(10, 80));
+    jQuery.each(d, function(time, data) {
+
+        circs.push($(createCircle('star', 40, 30, data[1], data[2], mkTime(time))));
+    });
+    jQuery.each(circs, function (idx, $obj) {
+        $obj.velocity(
+            {translateX: "+="+$obj.attr('to_x'), translateY: "+="+$obj.attr('to_y') },
+            {delay: $obj.attr('wait')}
+        );
+        console.log($obj.attr('wait'));
+    });
+
 }
 $('#map').on('load', findMap);
-
-$('#map').on('load', createCircle);
 $('#map').hover(animateCircle);

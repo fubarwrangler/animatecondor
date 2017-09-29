@@ -26,7 +26,7 @@ def front_page():
 @app.route('/api/revents')
 def get_random_events():
     data = {}
-    times = [random.randint(0, 1000) for x in range(10)]
+    times = [random.randint(0, 1000) for x in range(random.randint(3, 8))]
     for t in times:
         data[t] = ('start', random.randint(100, 800), random.randint(100, 800))
     return jsonify(data)
