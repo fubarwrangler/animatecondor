@@ -18,7 +18,7 @@ function createCircle (experiment, x, y, dx, dy, dt) {
   var circle = document.createElementNS(svgns, 'circle');
   circle.setAttributeNS(null, 'cx', x);
   circle.setAttributeNS(null, 'cy', y);
-  circle.setAttributeNS(null, 'r', 8);
+  circle.setAttributeNS(null, 'r', 4);
   circle.setAttributeNS(null, 'to_x', dx);
   circle.setAttributeNS(null, 'to_y', dy);
   circle.setAttributeNS(null, 'wait', dt);
@@ -43,12 +43,15 @@ function doAnimation(d) {
         circs.push($(createCircle('star', 40, 30, data[1], data[2], mkTime(time))));
     });
     jQuery.each(circs, function (idx, $obj) {
-        $obj.velocity(
-            {translateX: "+="+$obj.attr('to_x'), translateY: "+="+$obj.attr('to_y') },
-            {delay: $obj.attr('wait')}
-        );
+        $obj.velocity({
+            translateX: "+="+$obj.attr('to_x'),
+            translateY: "+="+$obj.attr('to_y'),
+            }, { delay: $obj.attr('wait'), }
+        ).velocity({r: 9}, {duration: 1200})
+        .velocity({r: 1}, {complete: function(e) { $(e).remove(); }});
         console.log($obj.attr('wait'));
     });
+
 
 }
 $('#map').on('load', findMap);
