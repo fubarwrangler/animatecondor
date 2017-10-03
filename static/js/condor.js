@@ -4,15 +4,12 @@ var theMap = null;
 function findMap() {
     if (theMap == null)
         theMap = document.getElementById("map").contentDocument.documentElement;
+        $(theMap).on('click', xy);
 }
 
 function randInt(min, max)  {
     return Math.floor((Math.random() * max) + min);
 }
-
-$.fn.exists = function () {
-    return this.length !== 0;
-};
 
 function createCircle (experiment, x, y, dx, dy, dt) {
   var circle = document.createElementNS(svgns, 'circle');
@@ -40,19 +37,23 @@ function doAnimation(d) {
     //createCircle('star', randInt(10, 50), randInt(10, 80));
     jQuery.each(d, function(time, data) {
 
-        circs.push($(createCircle('star', 40, 30, data[1], data[2], mkTime(time))));
+        circs.push($(createCircle('star', 500, 300, data[1], data[2], mkTime(time))));
     });
     jQuery.each(circs, function (idx, $obj) {
         $obj.velocity({
-            translateX: "+="+$obj.attr('to_x'),
-            translateY: "+="+$obj.attr('to_y'),
-            }, { delay: $obj.attr('wait'), }
-        ).velocity({r: 9}, {duration: 1200})
-        .velocity({r: 1}, {complete: function(e) { $(e).remove(); }});
-        console.log($obj.attr('wait'));
+                translateX: "+="+$obj.attr('to_x'),
+                translateY: "+="+$obj.attr('to_y'),
+                }, { delay: $obj.attr('wait'), } )
+            .velocity({r: 9}, {duration: 1200})
+            .velocity({r: 1}, {complete: function(e) { $(e).remove(); }});
     });
-
-
 }
+
+function xy(e) {
+    var dim = e.currentTarget.getBoundingClientRect();
+    var pctX = e.clientX / dim.width;
+    var pctY = e.clientY / dim.height;
+}
+
 $('#map').on('load', findMap);
 $('#map').hover(animateCircle);
