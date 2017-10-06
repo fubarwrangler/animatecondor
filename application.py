@@ -1,9 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
-from collections import defaultdict
+from flask import Flask, render_template, request, jsonify, Response
 
-import logging
-import datetime
-import json
 import random
 
 app = Flask(__name__)
@@ -11,6 +7,13 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 import views  # noqa
+from models import db_session   # noqa
+from models.racks import Rack   # noqa
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
 
 @app.errorhandler(404)
@@ -30,6 +33,18 @@ def get_random_events():
     for t in times:
         data[t] = ('start', random.randint(100, 800), random.randint(100, 800))
     return jsonify(data)
+
+
+@app.route('/racks')
+def show_racks():
+    return render_template('racks.html', racks=Rack.query.all())
+
+
+@app.route('/racks/update', methods=['POST'])
+def update_racks():
+    data = request.get_json()
+    print data
+    return Response(status=200, response='Updated rack')
 
 
 def map_rack_location(node):

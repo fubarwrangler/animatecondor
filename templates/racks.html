@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{%- block endjs %}
+  {{ macros.js('condor.js') }}
+{%- endblock %}
+{% block body %}
+Racks:
+<table>
+{%- for r in racks %}
+<tr><td>{{r.row}}-{{r.rack}}</td><td>{{r.x}}, {{r.y}}</td></tr>
+{%- endfor -%}
+</table>
+{% endblock %}
