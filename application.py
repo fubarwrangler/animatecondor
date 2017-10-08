@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, Response
 
 import random
+import re
 
 app = Flask(__name__)
 
@@ -43,8 +44,14 @@ def show_racks():
 @app.route('/racks/update', methods=['POST'])
 def update_racks():
     data = request.get_json()
-    print data
-    return Response(status=200, response='Updated rack')
+    m = re.match('^(\d+)-(\d)+$', data['rack'])
+    if not m:
+        return Response(status=520)
+    row, rack = map(int, m.groups())
+    x, y = data['x'], data['y']
+    
+
+    return Response(status=201)
 
 
 def map_rack_location(node):
