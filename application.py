@@ -41,15 +41,32 @@ def show_racks():
     return render_template('racks.html', racks=Rack.query.all())
 
 
+@app.route('/api/racks')
+def get_rack_data():
+    data = dict([('%d-%d' % (x.row, x.rack), (x.x, x.y)) for x in Rack.query.all()])
+    return jsonify(data)
+
+
 @app.route('/racks/update', methods=['POST'])
 def update_racks():
     data = request.get_json()
-    m = re.match('^(\d+)-(\d)+$', data['rack'])
+    print data
+    m = re.match('^(\d+)-(\d+)+$', data['rack'])
     if not m:
         return Response(status=520)
-    row, rack = map(int, m.groups())
+    n_row, n_rack = map(int, m.groups())
     x, y = data['x'], data['y']
-    
+
+    rack = Rack.query.filter_by(row=n_row, rack=n_rack).first()
+    if not rack:
+        app.logger.info("Creating new rack %d-%d: %s", n_row, n_rack, data)
+        rack = Rack(row=n_row, rack=n_rack)
+    else:
+        app.logger.info("Found rack, updating")
+    rack.x = x
+    rack.y = y
+    db_session.add(rack)
+    db_session.commit()
 
     return Response(status=201)
 

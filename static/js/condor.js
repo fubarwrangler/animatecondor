@@ -54,18 +54,25 @@ function xy(e) {
     var pctX = e.clientX / dim.width;
     var pctY = e.clientY / dim.height;
     var rack = prompt("Enter Rack Name", "11-1");
-    var data = {x: pctX, y: pctY, rack: rack};
-    $.ajax($SCRIPT_ROOT + '/racks/update', {
-		url: JSON.stringify(data),
-		contentType: 'application/json',
-		type: 'POST',
-		data: JSON.stringify(data),
-	}).fail(function(result)    {
-        alert("Invalid rack name");
-    }).done(function(data)    {
-        alert("Updated OK");
-    });
+    if (rack != null) {
+      var data = {x: pctX, y: pctY, rack: rack};
+      $.ajax($SCRIPT_ROOT + '/racks/update', {
+  		url: JSON.stringify(data),
+  		contentType: 'application/json',
+  		type: 'POST',
+  		data: JSON.stringify(data),
+  	  }).fail(function(result)    {
+          alert("Invalid rack name");
+      }).done(function(data)    {
+          alert("Updated OK");
+      });
+    }
+}
+
+function drawRacks() {
+
 }
 
 $('#map').on('load', findMap);
-//$('#map').hover(animateCircle);
+$('#map').hover(animateCircle);
+//$('#map').hover(drawRacks);
