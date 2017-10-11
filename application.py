@@ -38,7 +38,7 @@ def get_random_events():
 
 @app.route('/racks')
 def show_racks():
-    return render_template('racks.html', racks=Rack.query.all())
+    return render_template('racks.html', racks=Rack.query.order_by(Rack.row, Rack.rack).all())
 
 
 @app.route('/api/racks')

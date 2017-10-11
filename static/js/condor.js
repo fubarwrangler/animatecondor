@@ -74,5 +74,5 @@ function drawRacks() {
 }
 
 $('#map').on('load', findMap);
-$('#map').hover(animateCircle);
+//$('#map').hover(animateCircle);
 //$('#map').hover(drawRacks);
