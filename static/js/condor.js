@@ -4,7 +4,8 @@ var theMap = null;
 function findMap() {
     if (theMap == null)
         theMap = document.getElementById("map").contentDocument.documentElement;
-        $(theMap).on('click', xy);
+        //$(theMap).on('click', xy);
+        // $(theMap).on('click', animateCircle);
 }
 
 function randInt(min, max)  {
@@ -36,14 +37,17 @@ function doAnimation(d) {
     }
     //createCircle('star', randInt(10, 50), randInt(10, 80));
     jQuery.each(d, function(time, data) {
-
-        circs.push($(createCircle('star', 500, 300, data[1], data[2], mkTime(time))));
+        var Tx = theMap.width.baseVal.value;
+        var Ty = theMap.height.baseVal.value;
+        circs.push($(createCircle('star', 100, 80,
+                                  data[1]*Tx, data[2]*Ty,
+                                  mkTime(time))));
     });
     jQuery.each(circs, function (idx, $obj) {
         $obj.velocity({
-                translateX: "+="+$obj.attr('to_x'),
-                translateY: "+="+$obj.attr('to_y'),
-                }, { delay: $obj.attr('wait'), } )
+                translateX: $obj.attr('to_x')-$obj.attr('cx'),
+                translateY: $obj.attr('to_y')-$obj.attr('cy'),
+              }, { delay: $obj.attr('wait'), duration: randInt(200,2000) } )
             .velocity({r: 9}, {duration: 1200})
             .velocity({r: 1}, {complete: function(e) { $(e).remove(); }});
     });
@@ -69,10 +73,7 @@ function xy(e) {
     }
 }
 
-function drawRacks() {
-
-}
-
 $('#map').on('load', findMap);
-//$('#map').hover(animateCircle);
-//$('#map').hover(drawRacks);
+//$('#map').on('hover', animateCircle);
+// $('#map').hover(drawRacks);
+$('#map').hover(animateCircle);

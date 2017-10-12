@@ -15,4 +15,4 @@ class Rack(Base):
                       {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'})
 
     def __repr__(self):
-        return '<Rack %d-%d>' % (self.row, self.rack)
+        return '<Rack %d-%d @ %x>' % (self.row, self.rack, id(self))

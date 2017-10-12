@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 app.config.from_object(__name__)
 
-import views  # noqa
+import views                    # noqa
 from models import db_session   # noqa
 from models.racks import Rack   # noqa
 
@@ -30,9 +30,12 @@ def front_page():
 @app.route('/api/revents')
 def get_random_events():
     data = {}
-    times = [random.randint(0, 1000) for x in range(random.randint(3, 8))]
-    for t in times:
-        data[t] = ('start', random.randint(100, 800), random.randint(100, 800))
+    racks = Rack.query.all()
+    #times = [random.randint(0, 1000) for x in len(racks)]
+    t = 0
+    for rack in racks:
+        data[t] = ('start', rack.x, rack.y)
+        t += 10
     return jsonify(data)
 
 
@@ -42,11 +45,12 @@ def show_racks():
 
 
 @app.route('/api/racks')
-def get_rack_data():
+def map_rack_data():
     data = dict([('%d-%d' % (x.row, x.rack), (x.x, x.y)) for x in Rack.query.all()])
     return jsonify(data)
 
 
+# Create racks by clicking on the map and sending %x, %y locations in the image
 @app.route('/racks/update', methods=['POST'])
 def update_racks():
     data = request.get_json()
@@ -69,7 +73,3 @@ def update_racks():
     db_session.commit()
 
     return Response(status=201)
-
-
-def map_rack_location(node):
-    pass
