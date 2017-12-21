@@ -1,15 +1,18 @@
 from flask import Flask, render_template, request, jsonify, Response
-
-import random
 import re
+import redis
+import time
 
 app = Flask(__name__)
-
 app.config.from_object(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 import views                    # noqa
 from models import db_session   # noqa
-from models.racks import Rack   # noqa
+from models import Rack, Machine         # noqa
+
+R = redis.from_url('redis://localhost:6379')
+ts = 0
 
 
 @app.teardown_appcontext
@@ -31,11 +34,38 @@ def front_page():
 def get_random_events():
     data = {}
     racks = Rack.query.all()
-    #times = [random.randint(0, 1000) for x in len(racks)]
     t = 0
     for rack in racks:
         data[t] = ('start', rack.x, rack.y)
         t += 10
+    return jsonify(data)
+
+
+def machine_location(node):
+    m = Machine.query.filter_by(node=node).first()
+    return Rack.query.filter_by(rack=m.rack, row=m.row).first()
+
+
+@app.route('/api/events/<int:ago>')
+def get_events(ago):
+    global ts
+    ago *= 1000.
+    relativetime = request.args.get('adj') == 'd'
+    if relativetime:
+        if ts == 0:
+            ts = R.zrange('starts', 0, 0, withscores=True)[0][1] + ago
+        else:
+            ts += ago
+    else:
+        ts = time.time()*1000.
+
+    data = dict()
+    for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
+        slot, node = loc.split(':')
+        tm = uxt - ts + ago
+        r = machine_location(node)
+        data[tm / 10.] = ('start', node, r.x, r.y)
+
     return jsonify(data)
 
 
@@ -53,8 +83,11 @@ def map_rack_data():
 # Create racks by clicking on the map and sending %x, %y locations in the image
 @app.route('/racks/update', methods=['POST'])
 def update_racks():
+
+    # Forbidden for production
+    return Response(403)
+
     data = request.get_json()
-    print data
     m = re.match('^(\d+)-(\d+)+$', data['rack'])
     if not m:
         return Response(status=520)
