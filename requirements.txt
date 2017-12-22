@@ -4,3 +4,5 @@ itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 Werkzeug==0.12.2
+Redis>=2.10.0
+Sqlalchemy>=1.1.0

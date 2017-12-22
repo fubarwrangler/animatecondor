@@ -5,7 +5,7 @@ function setupMap() {
     if (theMap == null)
         theMap = document.getElementById("map").contentDocument.documentElement;
         //$(theMap).on('click', xy);
-        $(theMap).on('click', animateCircle);
+        animateCircle();
 }
 
 function randInt(min, max)  {
@@ -27,7 +27,8 @@ function createCircle (color, x, y, dx, dy, dt) {
 }
 
 function animateCircle() {
-    $.get('/api/events/60?adj=d', function(data) { console.log(data); doAnimation(data); });
+    $.get($SCRIPT_ROOT + '/api/events/10', function(data) { doAnimation(data); });
+    setTimeout(animateCircle, 10000);
 }
 
 function doAnimation(d) {
@@ -35,6 +36,7 @@ function doAnimation(d) {
     function mkTime(time)   {
         return time * 1;
     }
+    console.log("Events: " + d);
     //createCircle('star', randInt(10, 50), randInt(10, 80));
     function getExperiment(node) {
        if (node.search(/rc.s6/) == 0) { return 'star'; }
@@ -88,6 +90,3 @@ function xy(e) {
 }
 
 $('#map').on('load', setupMap);
-// $('#map').on('hover', animateCircle);
-// $('#map').hover(drawRacks);
-// $('#map').hover(animateCircle);
