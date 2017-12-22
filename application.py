@@ -6,12 +6,13 @@ import time
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['JSON_SORT_KEYS'] = False
+app.config['REDIS'] = 'redis://localhost:6379'
 
 import views                    # noqa
 from models import db_session   # noqa
 from models import Rack, Machine         # noqa
 
-R = redis.from_url('redis://localhost:6379')
+R = redis.from_url(app.config['REDIS'])
 ts = 0
 
 
@@ -43,7 +44,15 @@ def get_random_events():
 
 def machine_location(node):
     m = Machine.query.filter_by(node=node).first()
-    return Rack.query.filter_by(rack=m.rack, row=m.row).first()
+    if m:
+        r = Rack.query.filter_by(rack=m.rack, row=m.row).first()
+        if r:
+            return r
+        else:
+            app.logger.warning("Rack %s for machine %s not found!" % m)
+    else:
+        app.logger.info('Machine %s not found!', m)
+    return None
 
 
 @app.route('/api/events/<int:ago>')
@@ -64,7 +73,12 @@ def get_events(ago):
         slot, node = loc.split(':')
         tm = uxt - ts + ago
         r = machine_location(node)
-        data[tm / 10.] = ('start', node, r.x, r.y)
+        data[tm] = ('start', node, r.x, r.y)
+    for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
+        slot, node, event = loc.split(':')
+        tm = uxt - ts + ago
+        r = machine_location(node)
+        data[tm] = ('exit', node, r.x, r.y)
 
     return jsonify(data)
 

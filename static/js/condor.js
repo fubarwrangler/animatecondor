@@ -27,8 +27,8 @@ function createCircle (color, x, y, dx, dy, dt) {
 }
 
 function animateCircle() {
-    $.get($SCRIPT_ROOT + '/api/events/10', function(data) { doAnimation(data); });
-    setTimeout(animateCircle, 10000);
+    $.get($SCRIPT_ROOT + '/api/events/20', function(data) { doAnimation(data); });
+    setTimeout(animateCircle, 20000);
 }
 
 function doAnimation(d) {

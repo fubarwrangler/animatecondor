@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from application import app
 
-engine = create_engine('sqlite:///racks_test.db', convert_unicode=True, echo=True)
+engine = create_engine('sqlite:///racks_test.db', convert_unicode=True, echo=False)
 
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
@@ -44,3 +44,5 @@ class Machine(Base):
     rack = Column(Integer)
 
     __table_args__ = ({'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'})
+    def __repr__(self):
+        return '<Machine %s (%d-%d) @ %x>' % (self.node, self.row, self.rack, id(self))
