@@ -4,8 +4,8 @@ var theMap = null;
 function setupMap() {
     if (theMap == null)
         theMap = document.getElementById("map").contentDocument.documentElement;
-        //$(theMap).on('click', xy);
-        animateCircle();
+        $(theMap).on('click', animateCircle);
+        //animateCircle();
 }
 
 function randInt(min, max)  {
@@ -27,8 +27,8 @@ function createCircle (color, x, y, dx, dy, dt) {
 }
 
 function animateCircle() {
-    $.get($SCRIPT_ROOT + '/api/events/20', function(data) { doAnimation(data); });
-    setTimeout(animateCircle, 20000);
+    $.get($SCRIPT_ROOT + '/api/events/20?adj=d', function(data) { doAnimation(data); });
+    //setTimeout(animateCircle, 20000);
 }
 
 function doAnimation(d) {
@@ -36,7 +36,6 @@ function doAnimation(d) {
     function mkTime(time)   {
         return time * 1;
     }
-    console.log("Events: " + d);
     //createCircle('star', randInt(10, 50), randInt(10, 80));
     function getExperiment(node) {
        if (node.search(/rc.s6/) == 0) { return 'star'; }
@@ -52,7 +51,6 @@ function doAnimation(d) {
                   'atlas' : ['green', 200, 80],
                   'other' : ['orange', 250, 80],
                   };
-        console.log("Data" + data[1]);
         var params = ed[getExperiment(data[1])];
 
         circs.push($(createCircle(params[0], params[1], params[2],

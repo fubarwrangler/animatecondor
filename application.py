@@ -49,9 +49,9 @@ def machine_location(node):
         if r:
             return r
         else:
-            app.logger.warning("Rack %s for machine %s not found!" % m)
+            app.logger.warning("Rack for machine %s not found!", m)
     else:
-        app.logger.info('Machine %s not found!', m)
+        app.logger.info('Machine %s not found!', node)
     return None
 
 
@@ -73,12 +73,12 @@ def get_events(ago):
         slot, node = loc.split(':')
         tm = uxt - ts + ago
         r = machine_location(node)
-        data[tm] = ('start', node, r.x, r.y)
-    for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
-        slot, node, event = loc.split(':')
-        tm = uxt - ts + ago
-        r = machine_location(node)
-        data[tm] = ('exit', node, r.x, r.y)
+        data[tm/5.] = ('start', node, r.x, r.y)
+    # for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
+    #     slot, node, event = loc.split(':')
+    #     tm = uxt - ts + ago
+    #     r = machine_location(node)
+    #     data[tm] = ('exit', node, r.x, r.y)
 
     return jsonify(data)
 
