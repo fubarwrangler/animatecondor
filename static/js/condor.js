@@ -20,18 +20,19 @@ function createStart (color, x, y, dx, dy, dt) {
   circle.setAttributeNS(null, 'to_x', dx);
   circle.setAttributeNS(null, 'to_y', dy);
   circle.setAttributeNS(null, 'wait', dt);
-  circle.setAttributeNS(null, 'class', "job " + color);
+  // circle.setAttributeNS(null, 'class', "job " + color);
   circle.setAttributeNS(null, 'fill', color );
   theMap.appendChild(circle);
   return circle;
 }
 function createExit(color, x, y, dt) {
   var pop = document.createElementNS(svgns, 'path');
-  pop.setAttributeNS(null, 'transform', "translate("+x+","+y+")");
-  pop.setAttributeNS(null, 'd', 'L50,50 M50,0 L0,50');
-  pop.setAttributeNS(null, 'style', "stroke:"+color+"; fill:none;");
+  // pop.setAttributeNS(null, 'transform', "translate("+x+","+y+")");
+  pop.setAttributeNS(null, 'd', 'M'+x+','+y+' m -5,-5 l 10,10 m 0,-10 l -10,10');
+  pop.setAttributeNS(null, 'stroke', color);
+  pop.setAttributeNS(null, 'stroke-width', 1);
   pop.setAttributeNS(null, 'wait', dt);
-  pop.setAttributeNS(null, 'class', "job " + color);
+  // pop.setAttributeNS(null, 'class', "job " + color);
   theMap.appendChild(pop);
   return pop;
 }
@@ -84,10 +85,12 @@ function doAnimation(d) {
             .velocity({r: 9}, {duration: 1200})
             .velocity({r: 1}, {complete: function(e) { $(e).remove(); }});
     });
-//    jQuery.each(exits, function(idx, $obj) {
-//        $obj.velocity({r: 9}, {delay: $obj.attr('wait'), duration: 1000})
-//          .velocity({r:1}, {complete: function(e) { $(e).remove(); }});
-//    });
+    console.log("Here");
+    jQuery.each(exits, function(idx, $obj) {
+       $obj.velocity({'stroke-width': 3}, {delay: $obj.attr('wait'), duration: 1400})
+           .velocity({'stroke-width': 1})
+           .velocity({translateY: +100}, {complete: function(e) { $(e).remove(); }});
+   });
 }
 
 function xy(e) {
