@@ -12,7 +12,7 @@ function randInt(min, max)  {
     return Math.floor((Math.random() * max) + min);
 }
 
-function createCircle (color, x, y, dx, dy, dt) {
+function createStart (color, x, y, dx, dy, dt) {
   var circle = document.createElementNS(svgns, 'circle');
   circle.setAttributeNS(null, 'cx', x);
   circle.setAttributeNS(null, 'cy', y);
@@ -25,6 +25,16 @@ function createCircle (color, x, y, dx, dy, dt) {
   theMap.appendChild(circle);
   return circle;
 }
+function createExit(color, x, y, dt) {
+  var pop = document.createElementNS(svgns, 'path');
+  pop.setAttributeNS(null, 'transform', "translate("+x+","+y+")");
+  pop.setAttributeNS(null, 'd', 'L50,50 M50,0 L0,50');
+  pop.setAttributeNS(null, 'style', "stroke:"+color+"; fill:none;");
+  pop.setAttributeNS(null, 'wait', dt);
+  pop.setAttributeNS(null, 'class', "job " + color);
+  theMap.appendChild(pop);
+  return pop;
+}
 
 function animateCircle() {
     $.get($SCRIPT_ROOT + '/api/events/20?adj=d', function(data) { doAnimation(data); });
@@ -32,11 +42,11 @@ function animateCircle() {
 }
 
 function doAnimation(d) {
-    var circs = [];
+    var starts = [];
+    var exits = [];
     function mkTime(time)   {
         return time * 1;
     }
-    //createCircle('star', randInt(10, 50), randInt(10, 80));
     function getExperiment(node) {
        if (node.search(/rc.s6/) == 0) { return 'star'; }
        else if(node.search(/rc.s2/) == 0) { return 'phenix'; }
@@ -52,12 +62,21 @@ function doAnimation(d) {
                   'other' : ['orange', 250, 80],
                   };
         var params = ed[getExperiment(data[1])];
+        switch (data[0]) {
+          case "start":
+            starts.push($(createStart(params[0], params[1], params[2],
+                       data[2]*Tx, data[3]*Ty,
+                       mkTime(time))));
+            break;
+          case "exit":
+            exits.push($(createExit(params[0], data[2]*Tx, data[3]*Ty, mkTime(time))));
+            break;
+          default:
+            break;
 
-        circs.push($(createCircle(params[0], params[1], params[2],
-                                  data[2]*Tx, data[3]*Ty,
-                                  mkTime(time))));
+        }
     });
-    jQuery.each(circs, function (idx, $obj) {
+    jQuery.each(starts, function (idx, $obj) {
         $obj.velocity({
                 translateX: $obj.attr('to_x')-$obj.attr('cx'),
                 translateY: $obj.attr('to_y')-$obj.attr('cy'),
@@ -65,6 +84,10 @@ function doAnimation(d) {
             .velocity({r: 9}, {duration: 1200})
             .velocity({r: 1}, {complete: function(e) { $(e).remove(); }});
     });
+//    jQuery.each(exits, function(idx, $obj) {
+//        $obj.velocity({r: 9}, {delay: $obj.attr('wait'), duration: 1000})
+//          .velocity({r:1}, {complete: function(e) { $(e).remove(); }});
+//    });
 }
 
 function xy(e) {

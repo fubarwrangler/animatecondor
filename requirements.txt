@@ -6,3 +6,4 @@ MarkupSafe==1.0
 Werkzeug==0.12.2
 Redis>=2.10.0
 Sqlalchemy>=1.1.0
+Gunicorn>=19.0.0
