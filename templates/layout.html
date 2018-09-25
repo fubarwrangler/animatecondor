@@ -5,12 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  {{ macros.css('vendor/bootstrap-4.0.0.min.css') }}
-
-  {{ macros.js ('vendor/jquery-3.2.1.min.js') }}
-  {{ macros.js ('vendor/bootstrap-4.0.0.min.js') }}
-  {{ macros.js ('vendor/velocity-1.5.0.min.js') }}
-
+  {{ macros.js ('vendor/jquery-3.3.1.min.js') }}
   {{ macros.css('style.css') }}
   <script type="text/javascript">
     var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};

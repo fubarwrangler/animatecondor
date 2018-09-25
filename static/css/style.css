@@ -1,9 +1,22 @@
 @charset "utf-8";
 
-#map {
-  width: 98%;
+#graphics {
+    position: relative;
+    /* display:inline-block; */
+    width: 98%;
 }
 
+#map {
+    position: absolute;
+    width: 98%;
+    object-fit: contain;
+    z-index: -1;
+}
+
+#overlay {
+    z-index: 10;
+
+}
 table {
     border: 1px solid orange;
 }

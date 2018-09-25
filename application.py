@@ -99,7 +99,7 @@ def map_rack_data():
 def update_racks():
 
     # Forbidden for production
-    return Response(403)
+    return Response(status=403)
 
     data = request.get_json()
     m = re.match('^(\d+)-(\d+)+$', data['rack'])
