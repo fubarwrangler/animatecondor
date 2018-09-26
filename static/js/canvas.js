@@ -1,11 +1,12 @@
 var canvas = $('#overlay')[0];
+var CH, CW;
 // canvas.height = canvas.height / 2;
 function drawSample() {
 
   var context = canvas.getContext('2d');
   var centerX = canvas.width / 2;
   var centerY = canvas.height / 2;
-  var radius = 70;
+  var radius = CH / 6;
 
   context.beginPath();
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
@@ -22,4 +23,22 @@ function drawSample() {
   context.rect(0,0,canvas.width, canvas.height);
   context.stroke();
 }
-drawSample();
+
+/* Resize the canvas to the current size of the image as displayed */
+function sizeCanvas($obj) {
+  CW = $obj.width();
+  CH = $obj.height();
+  canvas.width = CW;
+  canvas.height = CH;
+}
+
+
+$('#map').on('load', function(ev) {
+  sizeCanvas($('#map'));
+  drawSample();
+});
+
+$(window).resize(function () {
+  sizeCanvas($('#map'));
+  drawSample();
+});
