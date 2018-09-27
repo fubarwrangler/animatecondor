@@ -1,3 +1,4 @@
+// jshint esversion: 6
 var canvas = $('#overlay')[0];
 var CH, CW;
 // canvas.height = canvas.height / 2;
@@ -24,6 +25,7 @@ function drawSample() {
   context.stroke();
 }
 
+
 /* Resize the canvas to the current size of the image as displayed */
 function sizeCanvas($obj) {
   CW = $obj.width();
@@ -32,13 +34,12 @@ function sizeCanvas($obj) {
   canvas.height = CH;
 }
 
-
 $('#map').on('load', function(ev) {
   sizeCanvas($('#map'));
   drawSample();
 });
 
-$(window).resize(function () {
+$(window).resize(()=>{
   sizeCanvas($('#map'));
   drawSample();
 });
