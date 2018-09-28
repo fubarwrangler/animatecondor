@@ -68,12 +68,12 @@ def get_events(ago):
     else:
         ts = time.time()*1000.
 
-    data = dict()
+    data = []
     for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
         slot, node = loc.split(':')
         tm = uxt - ts + ago
         r = machine_location(node)
-        data[tm] = ('start', node, r.x, r.y)
+        data.append(['start', tm, node, r.x, r.y])
     # for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
     #     slot, node, event = loc.split(':')
     #     tm = uxt - ts + ago

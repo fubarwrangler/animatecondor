@@ -1,5 +1,5 @@
 // jshint esversion: 6
-var Fields = Object.freeze({TYPE: 0, NODE: 1, X: 2, Y: 3});
+var Fields = Object.freeze({TYPE: 0, TIME: 1, NODE: 2, X: 3, Y: 4});
 var thisStart = 0;
 
 function getExperiment(node) {
@@ -13,8 +13,7 @@ function getExperiment(node) {
 function getData(dt) {
   $.get($SCRIPT_ROOT + '/api/events/'+dt+'?adj=d', (data) => {
     thisStart = Date.now();
-    // console.log(thisStart);
-    console.log(thisStart, " Got ", Object.keys(data).length, " more");
+    console.log(thisStart, " Got ", data.length, " more");
     createPoints(data, dt);
   });
 }
@@ -56,24 +55,15 @@ function StartJob(experiment, x, y, time) {
 }
 
 
+
 var startJobs = [];
 
 function createPoints(rawdata, timestep) {
-  // console.log(rawdata);
-  for (let key in rawdata) {
-    let val = rawdata[key];
-    let time = parseFloat(key);
-    if(val[Fields.TYPE] == 'start')  {
-      startJobs.push(new StartJob(getExperiment(val[Fields.NODE]), val[Fields.X], val[Fields.Y], time));
-    } else {
+  rawdata.forEach((itm) => {
+    let time = parseFloat(itm[Fields.TIME]);
+    startJobs.push(new StartJob(getExperiment(itm[Fields.NODE]), itm[Fields.X], itm[Fields.Y], time));
+  });
 
-    }
-  }
-  startJobs.sort((a,b) => a.time - b.time);
 }
-
-$('h1').click(()=>{
-  console.log(startJobs);
-});
 
 $('#overlay').on('click', () => { getData(20); });
