@@ -83,6 +83,11 @@ def get_events(ago):
     return jsonify(data)
 
 
+@app.route('/api/test/single')
+def test_event():
+    return jsonify([['start', 0, 'rcas6000', 0.8, 0.4]])
+
+
 @app.route('/racks')
 def show_racks():
     return render_template('racks.html', racks=Rack.query.order_by(Rack.row, Rack.rack).all())

@@ -18,6 +18,14 @@ function getData(dt) {
   });
 }
 
+function getTestData(dt) {
+  $.get($SCRIPT_ROOT + '/api/test/single', (data) => {
+    thisStart = Date.now();
+    console.log(thisStart, "TEST Got ", data.length, " more");
+    createPoints(data, dt);
+  });
+}
+
 function getColor(experiment) {
   let cmap = {
     'star':   'blue',
@@ -41,17 +49,31 @@ function getStartLocation(experiment) {
 
 
 
-function StartJob(experiment, x, y, time) {
-  [this.x, this.y] = getStartLocation(experiment);
-  this.time = time + thisStart;
-  this.end_x = x;
-  this.end_y = y;
-  this.vx = 0;
-  this.vy = 0;
-  this.radius = 3;
-  this.color = getColor(experiment);
-  this.started = false;
-  this.finished = false;
+class StartJob {
+  constructor(experiment, x, y, time) {
+    [this.x, this.y] = getStartLocation(experiment);
+    this.begin = time + thisStart;
+    this.t = 0;
+    this.end_x = x;
+    this.end_y = y;
+    this.r = 3;
+    this.vx = 0;
+    this.vy = 0;
+    this.radius = 3;
+    this.color = getColor(experiment);
+    this.done = false;
+    // this.lifetime = Math.random() * 10 * 1000;
+  }
+  draw(ctx, dt)  {
+    ctx.beginPath();
+    ctx.arc(this.x * CW, this.y * CH, this.r, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+  distance()  {
+    return Math.hypot((this.x - this.end_x), (this.y - this.end_y));
+  }
 }
 
 
@@ -61,9 +83,10 @@ var startJobs = [];
 function createPoints(rawdata, timestep) {
   rawdata.forEach((itm) => {
     let time = parseFloat(itm[Fields.TIME]);
-    startJobs.push(new StartJob(getExperiment(itm[Fields.NODE]), itm[Fields.X], itm[Fields.Y], time));
+    let exp = getExperiment(itm[Fields.NODE]);
+    startJobs.push(new StartJob(exp, itm[Fields.X], itm[Fields.Y], time));
   });
 
 }
 
-$('#overlay').on('click', () => { getData(20); });
+$('#overlay').on('click', () => { getTestData(); });
