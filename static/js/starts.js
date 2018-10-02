@@ -1,12 +1,14 @@
 // jshint esversion: 6
 
 var runningStarts = [];
+var startTweens = new TWEEN.Group();
 
 function addNewStarts()  {
   now = Date.now();
   while(startJobs.length) {
     let j = startJobs.shift();
     if (j.begin <= now) {
+      createStartAnimation(j);
       runningStarts.push(j);
     } else {
       startJobs.unshift(j);
@@ -15,40 +17,29 @@ function addNewStarts()  {
   }
 }
 
+function createStartAnimation(j) {
+
+  // Closure around j to allow callback from tween to reference parent obj
+  cleanup = (n) => { return () => { n.done = true; }; };
+
+  j.tweens.push(new TWEEN.Tween(j, startTweens)
+    .to({x: j.end_x, y: j.end_y}, j.duration *1000)
+    .onComplete(cleanup(j))
+    .start()
+  );
+}
+
+
 function removeFinishedStarts()  {
-  // now = Date.now();
-  // runningStarts.forEach(job => {
-  //   if (job.lifetime + job.begin < now) {
-  //     job.done = true;
-  //   }
-  // });
   runningStarts = runningStarts.filter(job => !job.done);
 }
 
-function updateStart(j, ctx)  {
-  if(j.t == 0)  {
-    Vmag = ((Math.random() / 4.0) + 0.75) / 30.0;
-    j.vx = (j.end_x - j.x) * Vmag;
-    j.vy = (j.end_y - j.y) * Vmag;
-  }
-  j.t++;
-  j.x += j.vx;
-  j.y += j.vy;
-  if(j.distance() < 0.01)  {
-    j.done = true;
-  }
-  j.draw(ctx);
-}
 
-
-
-$('h1').click(()=>{
+function animateStarts()  {
   addNewStarts();
   ctx = canvas.getContext('2d');
-  updateStart(runningStarts[0], ctx);
-
-  console.log(runningStarts[0]);
-  console.log("Starts ", startJobs.length, startJobs);
-  console.log("Runs ", runningStarts.length, runningStarts);
+  ctx.clearRect(0,0, CW, CH);
+  runningStarts.forEach(x => x.draw(ctx));
+  startTweens.update();
   removeFinishedStarts();
-});
+}

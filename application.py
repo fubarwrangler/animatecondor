@@ -6,7 +6,7 @@ import time
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['JSON_SORT_KEYS'] = False
-app.config['REDIS'] = 'redis://localhost:6379'
+app.config['REDIS'] = 'redis://localhost:6379/1'
 
 import views                    # noqa
 from models import db_session   # noqa
@@ -73,7 +73,8 @@ def get_events(ago):
         slot, node = loc.split(':')
         tm = uxt - ts + ago
         r = machine_location(node)
-        data.append(['start', tm, node, r.x, r.y])
+        if r:
+            data.append(['start', tm, node, r.x, r.y])
     # for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
     #     slot, node, event = loc.split(':')
     #     tm = uxt - ts + ago

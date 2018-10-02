@@ -1,6 +1,7 @@
 // jshint esversion: 6
 var Fields = Object.freeze({TYPE: 0, TIME: 1, NODE: 2, X: 3, Y: 4});
 var thisStart = 0;
+var DT = 10;
 
 function getExperiment(node) {
    if (node.search(/rc.s6/) == 0) { return 'star'; }
@@ -57,12 +58,10 @@ class StartJob {
     this.end_x = x;
     this.end_y = y;
     this.r = 3;
-    this.vx = 0;
-    this.vy = 0;
-    this.radius = 3;
     this.color = getColor(experiment);
     this.done = false;
-    // this.lifetime = Math.random() * 10 * 1000;
+    this.duration = (Math.random() * 2.0) + 3.0;
+    this.tweens = [];
   }
   draw(ctx, dt)  {
     ctx.beginPath();
@@ -86,7 +85,17 @@ function createPoints(rawdata, timestep) {
     let exp = getExperiment(itm[Fields.NODE]);
     startJobs.push(new StartJob(exp, itm[Fields.X], itm[Fields.Y], time));
   });
-
 }
 
-$('#overlay').on('click', () => { getTestData(); });
+function draw() {
+  animateStarts();
+  requestAnimationFrame(draw);
+}
+
+function update() {
+  getData(DT);
+  setTimeout(update, DT * 1000);
+}
+
+update();
+draw();
