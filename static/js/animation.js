@@ -15,15 +15,17 @@ function getData(dt) {
   $.get($SCRIPT_ROOT + '/api/events/'+dt+'?adj=d', (data) => {
     thisStart = Date.now();
     console.log(thisStart, " Got ", data.length, " more");
-    createPoints(data, dt);
+    createStartPoints(data.filter(r => r[0] == 'start'));
+    createExitPoints(data.filter(r => r[0] == 'exit'));
   });
 }
 
 function getTestData(dt) {
-  $.get($SCRIPT_ROOT + '/api/test/single', (data) => {
+  $.get($SCRIPT_ROOT + '/api/events/fake/' + dt, (data) => {
     thisStart = Date.now();
     console.log(thisStart, "TEST Got ", data.length, " more");
-    createPoints(data, dt);
+    createStartPoints(data.filter(r => r[0] == 'start'));
+    createExitPoints(data.filter(r => r[0] == 'exit'));
   });
 }
 
@@ -49,37 +51,13 @@ function getStartLocation(experiment) {
 }
 
 
-
-class StartJob {
-  constructor(experiment, x, y, time) {
-    [this.x, this.y] = getStartLocation(experiment);
-    this.begin = time + thisStart;
-    this.t = 0;
-    this.end_x = x;
-    this.end_y = y;
-    this.r = 3;
-    this.color = getColor(experiment);
-    this.done = false;
-    this.duration = (Math.random() * 2.0) + 3.0;
-    this.tweens = [];
-  }
-  draw(ctx, dt)  {
-    ctx.beginPath();
-    ctx.arc(this.x * CW, this.y * CH, this.r, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.fillStyle = this.color;
-    ctx.fill();
-  }
-  distance()  {
-    return Math.hypot((this.x - this.end_x), (this.y - this.end_y));
-  }
-}
-
-
+// Closure around j to allow callback from tween to reference parent obj
+jobCleanup = (n) => { return () => { n.done = true; }; };
 
 var startJobs = [];
+var exitJobs = [];
 
-function createPoints(rawdata, timestep) {
+function createStartPoints(rawdata) {
   rawdata.forEach((itm) => {
     let time = parseFloat(itm[Fields.TIME]);
     let exp = getExperiment(itm[Fields.NODE]);
@@ -87,15 +65,28 @@ function createPoints(rawdata, timestep) {
   });
 }
 
+function createExitPoints(rawdata) {
+  rawdata.forEach((itm) => {
+    let time = parseFloat(itm[Fields.TIME]);
+    let exp = getExperiment(itm[Fields.NODE]);
+    startJobs.push(new StartJob(exp, itm[Fields.X], itm[Fields.Y], time));
+  });
+}
+
+
 function draw() {
-  animateStarts();
+  ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,CW,CH);
+  animateStarts(ctx);
   requestAnimationFrame(draw);
 }
 
 function update() {
-  getData(DT);
+  getTestData(DT);
   setTimeout(update, DT * 1000);
 }
+
+// $('#overlay').on('click', () => { getData(10); });
 
 update();
 draw();

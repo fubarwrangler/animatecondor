@@ -1,22 +1,17 @@
 // jshint esversion: 6
 
-var runningStarts = [];
-var startTweens = new TWEEN.Group();
+var runningExits = [];
+var exitTweens = new TWEEN.Group();
 
-class StartJob {
+class ExitJob {
   constructor(experiment, x, y, time) {
     let dist;
-    [this.x, this.y] = getStartLocation(experiment);
+    this.x = x; this.y = y;
     this.begin = time + thisStart;
-    this.t = 0;
-    this.end_x = x;
-    this.end_y = y;
     this.r = 3;
     this.color = getColor(experiment);
     this.done = false;
     this.duration = (Math.random() * 3.0) + 1.8;
-    dist = (Math.hypot((this.x-this.end_x), (this.y-this.end_y)) * 2);
-    this.duration /= dist;
     this.tweens = [];
   }
   draw(ctx, dt)  {
@@ -29,21 +24,22 @@ class StartJob {
 }
 
 
-function addNewStarts()  {
+
+function addNewExits()  {
   now = Date.now();
-  while(startJobs.length) {
-    let j = startJobs.shift();
+  while(exitJobs.length) {
+    let j = exitJobs.shift();
     if (j.begin <= now) {
       createStartAnimation(j);
-      runningStarts.push(j);
+      runningExits.push(j);
     } else {
-      startJobs.unshift(j);
+      exitJobs.unshift(j);
       break;
     }
   }
 }
 
-function createStartAnimation(j) {
+function createExitAnimation(j) {
   flyover = new TWEEN.Tween(j, startTweens).to({x: j.end_x, y: j.end_y}, j.duration *1000);
   popradius = new TWEEN.Tween(j, startTweens).to({r: 5.1}, 500);
   shrinkradius = new TWEEN.Tween(j, startTweens).to({r: 0.01}, 300);
@@ -57,14 +53,14 @@ function createStartAnimation(j) {
 }
 
 
-function removeFinishedStarts()  {
-  runningStarts = runningStarts.filter(job => !job.done);
+function removeFinishedExits()  {
+  runningExits = runningExits.filter(job => !job.done);
 }
 
 
-function animateStarts(ctx)  {
-  addNewStarts();
-  runningStarts.forEach(x => x.draw(ctx));
+function animateExits(ctx)  {
+  addNewExits();
+  runningExits.forEach(x => x.draw(ctx));
   startTweens.update();
-  removeFinishedStarts();
+  removeFinishedExits();
 }

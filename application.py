@@ -1,7 +1,12 @@
 from flask import Flask, render_template, request, jsonify, Response
+from sqlalchemy import or_
 import re
-import redis
 import time
+import redis
+import random
+
+
+from jobgen import JobGen
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -80,6 +85,24 @@ def get_events(ago):
     #     tm = uxt - ts + ago
     #     r = machine_location(node)
     #     data[tm] = (event, node, r.x, r.y)
+
+    return jsonify(data)
+
+
+@app.route('/api/events/fake/<int:ago>')
+def fake_events(ago):
+    gen = JobGen([0.03, 0.3])
+    likes = ('rcas%', 'rcrs%', 'spool%', 'spar%', 'acas%')
+    m = Machine.query.filter(or_(Machine.node.like(x) for x in likes)).all()
+
+    data = []
+    for tm in gen.make_list([(0.05, 0.02), (3, 1)], ago):
+        n = random.choice(m)
+        r = machine_location(n.node)
+        if r:
+            data.append(['start', tm*1000., n.node, r.x, r.y])
+        # else:
+        #     app.logger.error("Loction: %s", n)
 
     return jsonify(data)
 
