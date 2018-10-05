@@ -31,13 +31,17 @@ function getTestData(dt) {
 
 function getColor(experiment) {
   let cmap = {
-    'star':   'blue',
-    'phenix': 'red',
-    'atlas': 'green',
-    'shared': 'purple',
-    'other': 'orange',
+    'star':   [0,0,255,1.0],    // blue
+    'phenix': [255,0,0,1.0],    // red
+    'atlas':  [0,128,0,1.0],    // green
+    'shared': [128,0,128,1.0],  // purple
+    'other':  [255,165,0,1.0],  // orange
   };
   return cmap[experiment];
+}
+
+function colorStr(r,g,b,a) {
+  return 'rgba('+r+','+g+','+b+','+a+')';
 }
 
 function getStartLocation(experiment) {

@@ -12,7 +12,7 @@ class StartJob {
     this.end_x = x;
     this.end_y = y;
     this.r = 3;
-    this.color = getColor(experiment);
+    this.color = colorStr.apply(null, getColor(experiment));
     this.done = false;
     this.duration = (Math.random() * 3.0) + 1.8;
     dist = (Math.hypot((this.x-this.end_x), (this.y-this.end_y)) * 2);
