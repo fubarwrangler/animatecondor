@@ -69,7 +69,7 @@ function createExitPoints(rawdata) {
   rawdata.forEach((itm) => {
     let time = parseFloat(itm[Fields.TIME]);
     let exp = getExperiment(itm[Fields.NODE]);
-    startJobs.push(new StartJob(exp, itm[Fields.X], itm[Fields.Y], time));
+    exitJobs.push(new ExitJob(exp, itm[Fields.X], itm[Fields.Y], time));
   });
 }
 
@@ -78,6 +78,7 @@ function draw() {
   ctx = canvas.getContext('2d');
   ctx.clearRect(0,0,CW,CH);
   animateStarts(ctx);
+  animateExits(ctx);
   requestAnimationFrame(draw);
 }
 

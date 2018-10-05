@@ -99,8 +99,9 @@ def fake_events(ago):
     for tm in gen.make_list([(0.05, 0.02), (3, 1)], ago):
         n = random.choice(m)
         r = machine_location(n.node)
+        mode = ['start', 'exit'][random.randint(0, 1)]
         if r:
-            data.append(['start', tm*1000., n.node, r.x, r.y])
+            data.append([mode, tm*1000., n.node, r.x, r.y])
         # else:
         #     app.logger.error("Loction: %s", n)
 
