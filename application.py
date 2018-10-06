@@ -48,14 +48,13 @@ def front_page():
 def machine_location(node):
     m = rack_data.get(node, None)
     if m:
-        x, y = m.robj.x, m.robj.y
-        if x >= 0:
-            return x, y
+        if m.robj:
+            return m.robj
         else:
-            app.logger.warning("Rack %s not found for %s", m.robj, node)
+            app.logger.warning("Rack %s not found for %s", m.rstr, node)
     else:
         app.logger.warning('Machine %s not found!', node)
-    return None, None
+    return None
 
 
 @app.route('/api/events/<int:ago>')
@@ -80,16 +79,16 @@ def get_events(ago):
     for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
         slot, node = loc.split(':')
         tm = uxt - ts + ago
-        x, y = machine_location(node)
-        if x:
-            data.append(['start', tm, node, x, y])
+        r = machine_location(node)
+        if r:
+            data.append(['start', tm, node, r.x, r.y])
 
     for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
         slot, node, event = loc.split(':')
         tm = uxt - ts + ago
-        x, y = machine_location(node)
-        if x:
-            data.append([event, tm, node, x, y])
+        r = machine_location(node)
+        if r:
+            data.append([event, tm, node, r.x, r.y])
 
     return jsonify(data)
 
@@ -103,10 +102,10 @@ def fake_events(ago):
     data = []
     for tm in gen.make_list([(0.05, 0.02), (2, 1)], ago):
         n = random.choice(m)
-        x, y = machine_location(n.node)
         mode = ['start', 'exit'][random.randint(0, 1)]
-        if x > 0:
-            data.append([mode, tm*1000., n.node, x, y])
+        r = machine_location(n.node)
+        if r:
+            data.append([mode, tm*1000., n.node, r.x, r.y])
 
     return jsonify(data)
 

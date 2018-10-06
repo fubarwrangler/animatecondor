@@ -43,9 +43,13 @@ class Machine(Base):
     node = Column(String, primary_key=True)
     row = Column(Integer)
     rack = Column(Integer)
-    robj = relationship("Rack", primaryjoin='and_(Machine.rack==Rack.rack, Machine.row==Rack.row)', foreign_keys='[Rack.rack, Rack.row]', lazy='joined', innerjoin=True, uselist=False)
+    robj = relationship("Rack", primaryjoin='and_(Machine.rack==Rack.rack, Machine.row==Rack.row)', foreign_keys='[Rack.rack, Rack.row]', lazy='joined', uselist=False)
 
 
     __table_args__ = ({'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'})
     def __repr__(self):
         return '<Machine %s (%d-%d) @ %x>' % (self.node, self.row, self.rack, id(self))
+
+    @property
+    def rstr(self):
+        return '%d-%d' % (self.row, self.rack)

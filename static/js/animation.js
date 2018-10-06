@@ -1,7 +1,7 @@
 // jshint esversion: 6
 var Fields = Object.freeze({TYPE: 0, TIME: 1, NODE: 2, X: 3, Y: 4});
 var thisStart = 0;
-var DT = 10;
+var DT = 20;
 
 function getExperiment(node) {
    if (node.search(/rc.s6/) == 0) { return 'star'; }
