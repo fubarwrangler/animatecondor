@@ -1,4 +1,12 @@
 {% extends "layout.html" %}
+{%- block extraheaders %}
+  <script>
+  {% if debug == 'fake' %} var data_url_type = 0;
+  {% elif debug == 'local' %} var data_url_type = 1;
+  {% else %} var data_url_type = 2;
+  {% endif %}
+  </script>
+{%- endblock %}
 {%- block endjs %}
   <!-- {{ macros.js('rackclick.js') }} -->
   {{ macros.js('canvas.js') }}

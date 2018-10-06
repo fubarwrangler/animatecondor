@@ -12,18 +12,14 @@ function getExperiment(node) {
 }
 
 function getData(dt) {
-  $.get($SCRIPT_ROOT + '/api/events/'+dt+'?adj=d', (data) => {
+  let urls = [
+    '/api/events/fake/' + dt,
+    '/api/events/'+dt+'?adj=d',
+    '/api/events/' + dt
+  ]; // index here is defined in template based on debug, last one is production
+  $.get($SCRIPT_ROOT + urls[data_url_type], (data) => {
     thisStart = Date.now();
     console.log(thisStart, " Got ", data.length, " more");
-    createStartPoints(data.filter(r => r[0] == 'start'));
-    createExitPoints(data.filter(r => r[0] == 'exit'));
-  });
-}
-
-function getTestData(dt) {
-  $.get($SCRIPT_ROOT + '/api/events/fake/' + dt, (data) => {
-    thisStart = Date.now();
-    console.log(thisStart, "TEST Got ", data.length, " more");
     createStartPoints(data.filter(r => r[0] == 'start'));
     createExitPoints(data.filter(r => r[0] == 'exit'));
   });
@@ -87,7 +83,7 @@ function draw() {
 }
 
 function update() {
-  getTestData(DT);
+  getData(DT);
   setTimeout(update, DT * 1000);
 }
 

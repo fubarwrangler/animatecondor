@@ -21,7 +21,7 @@ class StartJob {
   }
   draw(ctx, dt)  {
     ctx.beginPath();
-    ctx.arc(this.x * CW, this.y * CH, this.r, 0, Math.PI * 2, true);
+    ctx.arc(this.x * CW, this.y * CH, this.r * CScale, 0, Math.PI * 2, true);
     ctx.closePath();
     ctx.fillStyle = this.color;
     ctx.fill();

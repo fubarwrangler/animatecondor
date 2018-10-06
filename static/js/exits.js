@@ -16,11 +16,11 @@ class ExitJob {
   }
   draw(ctx, dt)  {
     ctx.beginPath();
-    ctx.arc(this.x * CW, this.y * CH, this.r, 0, Math.PI * 2);
+    ctx.arc(this.x * CW, this.y * CH, this.r * CScale, 0, Math.PI * 2);
     ctx.closePath();
     this.color[3] = this.alpha;
     ctx.strokeStyle = colorStr.apply(null, this.color);
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 * CScale;
     ctx.stroke();
   }
 }

@@ -9,15 +9,16 @@ import random
 from jobgen import JobGen
 
 app = Flask(__name__)
-app.config.from_object(__name__)
+
+app.config.from_pyfile('test.cfg')
+app.config.from_envvar('ANIMATE_CFG', silent=True)
 app.config['JSON_SORT_KEYS'] = False
-app.config['REDIS'] = 'redis://localhost:6379/1'
 
 import views                    # noqa
 from models import db_session   # noqa
 from models import Rack, Machine         # noqa
 
-R = redis.from_url(app.config['REDIS'])
+R = redis.from_url(app.config['REDIS_URL'])
 ts = 0
 
 
@@ -33,7 +34,8 @@ def page_not_found(e):
 
 @app.route('/')
 def front_page():
-    return render_template('front_page.html')
+    app.logger.error(app.config['DEBUG'])
+    return render_template('front_page.html', debug=app.config['DEBUG'])
 
 
 @app.route('/api/revents')
@@ -80,11 +82,13 @@ def get_events(ago):
         r = machine_location(node)
         if r:
             data.append(['start', tm, node, r.x, r.y])
-    # for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
-    #     slot, node, event = loc.split(':')
-    #     tm = uxt - ts + ago
-    #     r = machine_location(node)
-    #     data[tm] = (event, node, r.x, r.y)
+
+    for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
+        slot, node, event = loc.split(':')
+        tm = uxt - ts + ago
+        r = machine_location(node)
+        if r:
+            data.append([event, tm, node, r.x, r.y])
 
     return jsonify(data)
 

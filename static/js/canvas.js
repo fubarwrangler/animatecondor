@@ -1,6 +1,7 @@
 // jshint esversion: 6
 var canvas = $('#overlay')[0];
-var CH, CW;
+var CH, CW, CScale;
+var scaleFactor = 1000;
 // canvas.height = canvas.height / 2;
 function drawSample() {
 
@@ -30,6 +31,7 @@ function drawSample() {
 function sizeCanvas($obj) {
   CW = $obj.width();
   CH = $obj.height();
+  CScale = CW / scaleFactor;
   canvas.width = CW;
   canvas.height = CH;
 }

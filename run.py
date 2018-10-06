@@ -38,4 +38,4 @@ if __name__ == "__main__":
     if '-l' not in sys.argv:
         app.wsgi_app = LoggingMiddleware(app.wsgi_app)
         app.wsgi_app = ScriptNameEdit(app.wsgi_app)
-    app.run(debug=True, threaded=True)
+    app.run(threaded=True)
