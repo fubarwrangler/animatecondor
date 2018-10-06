@@ -19,6 +19,6 @@ function xy(e) {
 }
 
 $('#map').on('load', function () {
-  theMap = document.getElementById("map").contentDocument.documentElement;
+  var theMap = document.getElementById("map").contentDocument.documentElement;
   $(theMap).on('click', xy);
 });

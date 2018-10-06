@@ -8,17 +8,21 @@
   </script>
 {%- endblock %}
 {%- block endjs %}
-  <!-- {{ macros.js('rackclick.js') }} -->
+  {% if debug == 'edit' %}
+  {{ macros.js('rackclick.js') }}
+  {% else %}
   {{ macros.js('canvas.js') }}
   {{ macros.js('starts.js') }}
   {{ macros.js('exits.js') }}
   {{ macros.js('animation.js') }}
+  {% endif %}
 {%- endblock %}
 {% block body %}
 <div id="graphics">
-  <!-- <object id="map" data="{{ url_for('static', filename='facility.svg')}}" type="image/svg+xml"></object> -->
-  <img id="map" src="{{ url_for('static', filename='facility.svg')}}" />
+  <object id="map" data="{{ url_for('static', filename='facility.svg')}}" type="image/svg+xml"></object>
+  {% if debug != 'edit' %}
   <canvas id="overlay" height="300" width="500"></canvas>
+  {% endif %}
 </div>
 <p>rate /10s: <span id="rate">0</span></p>
 {% endblock %}

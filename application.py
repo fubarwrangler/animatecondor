@@ -133,10 +133,11 @@ def map_rack_data():
 def update_racks():
 
     # Forbidden for production
-    return Response(status=403)
+    if app.config['DEBUG'] != 'edit':
+        return Response(status=403)
 
     data = request.get_json()
-    m = re.match('^(\d+)-(\d+)+$', data['rack'])
+    m = re.match(r'^(\d+)-(\d+)+$', data['rack'])
     if not m:
         return Response(status=520)
     n_row, n_rack = map(int, m.groups())
