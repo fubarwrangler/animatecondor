@@ -95,12 +95,12 @@ def get_events(ago):
 
 @app.route('/api/events/fake/<int:ago>')
 def fake_events(ago):
-    gen = JobGen([0.03, 0.3])
+    gen = JobGen([0.03, 0.8])
     likes = ('rcas%', 'rcrs%', 'spool%', 'spar%', 'acas%')
     m = Machine.query.filter(or_(Machine.node.like(x) for x in likes)).all()
 
     data = []
-    for tm in gen.make_list([(0.05, 0.02), (3, 1)], ago):
+    for tm in gen.make_list([(0.05, 0.02), (2, 1)], ago):
         n = random.choice(m)
         r = machine_location(n.node)
         mode = ['start', 'exit'][random.randint(0, 1)]

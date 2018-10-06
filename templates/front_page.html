@@ -15,11 +15,10 @@
   {{ macros.js('animation.js') }}
 {%- endblock %}
 {% block body %}
-<h1> Hello! </h1>
 <div id="graphics">
   <!-- <object id="map" data="{{ url_for('static', filename='facility.svg')}}" type="image/svg+xml"></object> -->
   <img id="map" src="{{ url_for('static', filename='facility.svg')}}" />
   <canvas id="overlay" height="300" width="500"></canvas>
 </div>
-
+<p>rate /10s: <span id="rate">0</span></p>
 {% endblock %}

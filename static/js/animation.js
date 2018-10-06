@@ -20,6 +20,7 @@ function getData(dt) {
   $.get($SCRIPT_ROOT + urls[data_url_type], (data) => {
     thisStart = Date.now();
     console.log(thisStart, " Got ", data.length, " more");
+    $('#rate').text(data.length)
     createStartPoints(data.filter(r => r[0] == 'start'));
     createExitPoints(data.filter(r => r[0] == 'exit'));
   });
@@ -42,11 +43,11 @@ function colorStr(r,g,b,a) {
 
 function getStartLocation(experiment) {
   return {
-    'star':   [0.2, 0.1],
-    'phenix': [0.25, 0.1],
-    'atlas':  [0.3, 0.1],
-    'shared': [0.35, 0.1],
-    'other':  [0.4, 0.1],
+    'star':   [0.14, 0.09],
+    'phenix': [0.22, 0.09],
+    'shared': [0.58, 0.09],
+    'atlas':  [0.65, 0.09],
+    'other':  [0.4, 0.09],
   }[experiment];
 }
 
