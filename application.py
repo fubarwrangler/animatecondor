@@ -11,7 +11,7 @@ from jobgen import JobGen
 app = Flask(__name__)
 
 app.config.from_pyfile('test.cfg')
-app.config.from_envvar('ANIMATE_CFG', silent=True)
+app.config.from_envvar('FLASK_CFG', silent=True)
 app.config['JSON_SORT_KEYS'] = False
 
 import views                    # noqa
@@ -20,12 +20,20 @@ from models import Rack, Machine         # noqa
 
 R = redis.from_url(app.config['REDIS_URL'])
 ts = 0
+rack_data = {}
 
-app.logger.info("Mode: %s", app.config['DEBUG'])
 
-#@app.teardown_appcontext
-#def shutdown_session(exception=None):
-#    db_session.remove()
+@app.before_first_request
+def make_rackmap():
+    global rack_data
+    for r in Rack.query.all():
+        key = (r.row, r.rack)
+        rack_data[key] = (r.x, r.y)
+
+
+# @app.teardown_appcontext
+# def shutdown_session(exception=None):
+#     db_session.remove()
 
 
 @app.errorhandler(404)
@@ -41,18 +49,23 @@ def front_page():
 def machine_location(node):
     m = Machine.query.get(node)
     if m:
-        return m.rackobj
+        x, y = rack_data.get((m.row, m.rack), (-1, -1))
+        if x > 0:
+            return x, y
+        else:
+            app.logger.warning("Rack %d-%d not found for %s", m.row, m.rack, node)
     else:
-        app.logger.info('Machine %s not found!', node)
-    return None
+        app.logger.warning('Machine %s not found!', node)
+    return None, None
 
 
 @app.route('/api/events/<int:ago>')
 def get_events(ago):
     global ts
 
+    # Too large
     if ago > 1000:
-        return Response(status=413) # Too large
+        return Response(status=413)
 
     ago *= 1000.
     relativetime = request.args.get('adj') == 'd'
@@ -68,16 +81,16 @@ def get_events(ago):
     for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
         slot, node = loc.split(':')
         tm = uxt - ts + ago
-        r = machine_location(node)
-        if r:
-            data.append(['start', tm, node, r.x, r.y])
+        x, y = machine_location(node)
+        if x:
+            data.append(['start', tm, node, x, y])
 
     for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
         slot, node, event = loc.split(':')
         tm = uxt - ts + ago
-        r = machine_location(node)
-        if r:
-            data.append([event, tm, node, r.x, r.y])
+        x, y = machine_location(node)
+        if x:
+            data.append([event, tm, node, x, y])
 
     return jsonify(data)
 
@@ -91,10 +104,10 @@ def fake_events(ago):
     data = []
     for tm in gen.make_list([(0.05, 0.02), (2, 1)], ago):
         n = random.choice(m)
-        r = machine_location(n.node)
+        x, y = machine_location(n.node)
         mode = ['start', 'exit'][random.randint(0, 1)]
-        if r:
-            data.append([mode, tm*1000., n.node, r.x, r.y])
+        if x > 0:
+            data.append([mode, tm*1000., n.node, x, y])
 
     return jsonify(data)
 

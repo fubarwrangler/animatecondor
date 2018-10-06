@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, UniqueConstraint, String
 
-from sqlalchemy import create_engine, MetaData 
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -43,7 +43,6 @@ class Machine(Base):
     node = Column(String, primary_key=True)
     row = Column(Integer)
     rack = Column(Integer)
-    rackobj = relationship("Rack", primaryjoin='and_(Machine.rack==Rack.rack, Machine.row==Rack.row)', foreign_keys='[Rack.rack, Rack.row]', lazy='joined', innerjoin=True, uselist=False)
 
     __table_args__ = ({'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'})
     def __repr__(self):
