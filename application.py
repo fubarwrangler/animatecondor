@@ -21,10 +21,11 @@ from models import Rack, Machine         # noqa
 R = redis.from_url(app.config['REDIS_URL'])
 ts = 0
 
+app.logger.info("Mode: %s", app.config['DEBUG'])
 
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
+#@app.teardown_appcontext
+#def shutdown_session(exception=None):
+#    db_session.remove()
 
 
 @app.errorhandler(404)
@@ -34,29 +35,13 @@ def page_not_found(e):
 
 @app.route('/')
 def front_page():
-    app.logger.error(app.config['DEBUG'])
     return render_template('front_page.html', debug=app.config['DEBUG'])
 
 
-@app.route('/api/revents')
-def get_random_events():
-    data = {}
-    racks = Rack.query.all()
-    t = 0
-    for rack in racks:
-        data[t] = ('start', rack.x, rack.y)
-        t += 10
-    return jsonify(data)
-
-
 def machine_location(node):
-    m = Machine.query.filter_by(node=node).first()
+    m = Machine.query.get(node)
     if m:
-        r = Rack.query.filter_by(rack=m.rack, row=m.row).first()
-        if r:
-            return r
-        else:
-            app.logger.warning("Rack for machine %s not found!", m)
+        return m.rackobj
     else:
         app.logger.info('Machine %s not found!', node)
     return None
@@ -65,6 +50,10 @@ def machine_location(node):
 @app.route('/api/events/<int:ago>')
 def get_events(ago):
     global ts
+
+    if ago > 1000:
+        return Response(status=413) # Too large
+
     ago *= 1000.
     relativetime = request.args.get('adj') == 'd'
     if relativetime:
@@ -106,15 +95,8 @@ def fake_events(ago):
         mode = ['start', 'exit'][random.randint(0, 1)]
         if r:
             data.append([mode, tm*1000., n.node, r.x, r.y])
-        # else:
-        #     app.logger.error("Loction: %s", n)
 
     return jsonify(data)
-
-
-@app.route('/api/test/single')
-def test_event():
-    return jsonify([['start', 0, 'rcas6000', 0.8, 0.4]])
 
 
 @app.route('/racks')
