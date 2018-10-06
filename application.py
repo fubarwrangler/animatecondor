@@ -24,16 +24,22 @@ rack_data = {}
 
 
 @app.before_first_request
-def make_rackmap():
+def refresh_dbdata():
     global rack_data
+
+    racks = {}
     for r in Rack.query.all():
         key = (r.row, r.rack)
-        rack_data[key] = (r.x, r.y)
+        racks[key] = (r.x, r.y)
+
+    for m in Machine.query.all():
+        coords = racks.get((m.row, m.rack), (-1, -1))
+        rack_data[m.node] = (coords, (m.row, m.rack))
 
 
-# @app.teardown_appcontext
-# def shutdown_session(exception=None):
-#     db_session.remove()
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
 
 @app.errorhandler(404)
@@ -47,13 +53,13 @@ def front_page():
 
 
 def machine_location(node):
-    m = Machine.query.get(node)
-    if m:
-        x, y = rack_data.get((m.row, m.rack), (-1, -1))
-        if x > 0:
+    coords = rack_data.get(node, None)
+    if coords:
+        x, y = coords[0]
+        if x >= 0:
             return x, y
         else:
-            app.logger.warning("Rack %d-%d not found for %s", m.row, m.rack, node)
+            app.logger.warning("Rack %s not found for %s", coords[1], node)
     else:
         app.logger.warning('Machine %s not found!', node)
     return None, None
