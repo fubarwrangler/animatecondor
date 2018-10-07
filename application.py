@@ -77,18 +77,18 @@ def get_events(ago):
 
     data = []
     for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
-        slot, node = loc.split(':')
+        src, slot, node = loc.split(':')
         tm = uxt - ts + ago
         r = machine_location(node)
         if r:
-            data.append(['start', tm, node, r.x, r.y])
+            data.append(['start', src, tm, node, r.x, r.y])
 
     for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
-        slot, node, event = loc.split(':')
+        src, slot, node, event = loc.split(':')
         tm = uxt - ts + ago
         r = machine_location(node)
         if r:
-            data.append([event, tm, node, r.x, r.y])
+            data.append([event, src, tm, node, r.x, r.y])
 
     return jsonify(data)
 

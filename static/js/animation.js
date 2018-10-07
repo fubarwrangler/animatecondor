@@ -1,15 +1,7 @@
 // jshint esversion: 6
-var Fields = Object.freeze({TYPE: 0, TIME: 1, NODE: 2, X: 3, Y: 4});
+var Fields = Object.freeze({TYPE: 0, EXP: 1, TIME: 2, NODE: 3, X: 4, Y: 5});
 var thisStart = 0;
 var DT = 20;
-
-function getExperiment(node) {
-   if (node.search(/rc.s6/) == 0) { return 'star'; }
-   else if(node.search(/rc.s2/) == 0) { return 'phenix'; }
-   else if(node.search(/acas|spar/) == 0) { return 'atlas'; }
-   else if(node.search(/spool/) == 0) { return 'shared'; }
-   else { return 'other'; }
-}
 
 function getData(dt) {
   let urls = [
@@ -24,6 +16,19 @@ function getData(dt) {
     createStartPoints(data.filter(r => r[0] == 'start'));
     createExitPoints(data.filter(r => r[0] == 'exit'));
   });
+}
+
+function getExperiment(experiment) {
+
+  let data = { 'star': 'star',
+               'phenix': 'phenix',
+               'atlas': 'atlas',
+               'sdcc': 'shared',
+             }
+  if experiment in data {
+    return data[experiment]
+  }
+  return 'other'
 }
 
 function getColor(experiment) {
@@ -61,7 +66,7 @@ var exitJobs = [];
 function createStartPoints(rawdata) {
   rawdata.forEach((itm) => {
     let time = parseFloat(itm[Fields.TIME]);
-    let exp = getExperiment(itm[Fields.NODE]);
+    let exp = getExperiment(itm[Fields.EXP]);
     startJobs.push(new StartJob(exp, itm[Fields.X], itm[Fields.Y], time));
   });
 }
@@ -69,7 +74,7 @@ function createStartPoints(rawdata) {
 function createExitPoints(rawdata) {
   rawdata.forEach((itm) => {
     let time = parseFloat(itm[Fields.TIME]);
-    let exp = getExperiment(itm[Fields.NODE]);
+    let exp = getExperiment(itm[Fields.EXP]);
     exitJobs.push(new ExitJob(exp, itm[Fields.X], itm[Fields.Y], time));
   });
 }
