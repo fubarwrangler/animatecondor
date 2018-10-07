@@ -12,7 +12,6 @@ function getData(dt) {
   $.get($SCRIPT_ROOT + urls[data_url_type], (data) => {
     thisStart = Date.now();
     console.log(thisStart, " Got ", data.length, " more");
-    $('#rate').text(data.length);
     createStartPoints(data.filter(r => r[0] == 'start'));
     createExitPoints(data.filter(r => r[0] == 'exit'));
   });
@@ -84,7 +83,24 @@ function update() {
   setTimeout(update, DT * 1000);
 }
 
-// $('#overlay').on('click', () => { getData(10); });
+function counterHz(poll) {
+  let now = Date.now();
+  ago = now - (poll * 1000);
+  let starts = startJobs.filter(x => (ago < x.begin < now)).length +
+  runningStarts.filter(x => (ago < x.begin < now)).length;
+  $('#srate').text(starts/poll);
+  let ends = exitJobs.filter(x => (ago < x.begin < now)).length +
+  runningExits.filter(x => (ago < x.begin < now)).length;
+  $('#erate').text(ends/poll);
+}
+
+function counter() {
+  counterHz(5);
+  setTimeout(counter, 1000);
+}
+
+$('#overlay').on('click', () => { counterHz(5); });
 
 update();
 draw();
+counter();
