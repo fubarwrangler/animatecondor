@@ -12,7 +12,7 @@ function getData(dt) {
   $.get($SCRIPT_ROOT + urls[data_url_type], (data) => {
     thisStart = Date.now();
     console.log(thisStart, " Got ", data.length, " more");
-    $('#rate').text(data.length)
+    $('#rate').text(data.length);
     createStartPoints(data.filter(r => r[0] == 'start'));
     createExitPoints(data.filter(r => r[0] == 'exit'));
   });
@@ -24,11 +24,13 @@ function getExperiment(experiment) {
                'phenix': 'phenix',
                'atlas': 'atlas',
                'sdcc': 'shared',
-             }
-  if experiment in data {
-    return data[experiment]
+             };
+
+  if (experiment in data) {
+    return data[experiment];
   }
-  return 'other'
+
+  return 'other';
 }
 
 function getColor(experiment) {
@@ -45,17 +47,6 @@ function getColor(experiment) {
 function colorStr(r,g,b,a) {
   return 'rgba('+r+','+g+','+b+','+a+')';
 }
-
-function getStartLocation(experiment) {
-  return {
-    'star':   [0.14, 0.09],
-    'phenix': [0.22, 0.09],
-    'shared': [0.58, 0.09],
-    'atlas':  [0.65, 0.09],
-    'other':  [0.4, 0.09],
-  }[experiment];
-}
-
 
 // Closure around j to allow callback from tween to reference parent obj
 jobCleanup = (n) => { return () => { n.done = true; }; };

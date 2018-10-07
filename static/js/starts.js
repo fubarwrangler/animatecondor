@@ -3,6 +3,16 @@
 var runningStarts = [];
 var startTweens = new TWEEN.Group();
 
+function getStartLocation(experiment) {
+  return {
+    'star':   [0.14, 0.09],
+    'phenix': [0.22, 0.09],
+    'shared': [0.58, 0.09],
+    'atlas':  [0.65, 0.09],
+    'other':  [0.52, 0.09],
+  }[experiment];
+}
+
 class StartJob {
   constructor(experiment, x, y, time) {
     let dist;
@@ -11,7 +21,7 @@ class StartJob {
     this.t = 0;
     this.end_x = x;
     this.end_y = y;
-    this.r = 3;
+    this.r = 2.7;
     this.color = colorStr.apply(null, getColor(experiment));
     this.done = false;
     this.duration = (Math.random() * 3.0) + 1.8;

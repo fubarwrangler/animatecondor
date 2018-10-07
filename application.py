@@ -102,10 +102,11 @@ def fake_events(ago):
     data = []
     for tm in gen.make_list([(0.05, 0.02), (2, 1)], ago):
         n = random.choice(m)
-        mode = ['start', 'exit'][random.randint(0, 1)]
+        mode = random.choice(['start', 'exit'])
+        exp = random.choice(['star', 'phenix', 'atlas', 'other', 'shared'])
         r = machine_location(n.node)
         if r:
-            data.append([mode, tm*1000., n.node, r.x, r.y])
+            data.append([mode, exp, tm*1000., n.node, r.x, r.y])
 
     return jsonify(data)
 
