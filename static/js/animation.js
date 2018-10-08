@@ -1,5 +1,6 @@
 // jshint esversion: 6
 var Fields = Object.freeze({TYPE: 0, EXP: 1, TIME: 2, NODE: 3, X: 4, Y: 5});
+var JTypes = Object.freeze({START: 0, EXIT: 1, EVICT: 2});
 var thisStart = 0;
 var DT = 20;
 
@@ -12,8 +13,8 @@ function getData(dt) {
   $.get($SCRIPT_ROOT + urls[data_url_type], (data) => {
     thisStart = Date.now();
     console.log(thisStart, " Got ", data.length, " more");
-    createStartPoints(data.filter(r => r[0] == 'start'));
-    createExitPoints(data.filter(r => r[0] == 'exit'));
+    createStartPoints(data.filter(r => r[0] == JTypes.START));
+    createExitPoints(data.filter(r => r[0] == JTypes.EXIT));
   });
 }
 
@@ -99,8 +100,8 @@ function counter() {
   setTimeout(counter, 1000);
 }
 
-$('#overlay').on('click', () => { counterHz(5); });
+//$('#overlay').on('click', () => { counterHz(5); });
 
 update();
 draw();
-counter();
+// counter();

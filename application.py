@@ -21,6 +21,7 @@ from models import Rack, Machine         # noqa
 R = redis.from_url(app.config['REDIS_URL'])
 ts = 0
 rack_data = {}
+EVENTS = {'start': 0, 'exit': 1, 'evict': 2}
 
 
 @app.before_first_request
@@ -78,17 +79,17 @@ def get_events(ago):
     data = []
     for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
         src, slot, node = loc.split(':')
-        tm = uxt - ts + ago
+        tm = int(uxt - ts + ago)
         r = machine_location(node)
         if r:
-            data.append(['start', src, tm, node, r.x, r.y])
+            data.append(['start', src, tm, node, round(r.x, 5), round(r.y, 5)])
 
     for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
         src, slot, node, event = loc.split(':')
-        tm = uxt - ts + ago
+        tm = int(uxt - ts + ago)
         r = machine_location(node)
         if r:
-            data.append([event, src, tm, node, r.x, r.y])
+            data.append([EVENTS[event], src, tm, node, round(r.x, 5), round(r.y, 5)])
 
     return jsonify(data)
 
@@ -106,7 +107,7 @@ def fake_events(ago):
         exp = random.choice(['star', 'phenix', 'atlas', 'other', 'shared'])
         r = machine_location(n.node)
         if r:
-            data.append([mode, exp, tm*1000., n.node, r.x, r.y])
+            data.append([EVENTS[mode], exp, int(tm*1000.), n.node, round(r.x, 5), round(r.y, 5)])
 
     return jsonify(data)
 

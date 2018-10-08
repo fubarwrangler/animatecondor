@@ -32,8 +32,9 @@ class ScriptNameEdit(object):
         environ['SCRIPT_NAME'] = URL_PREFIX + url
         return self.app(environ, start_response)
 
+
 if '-l' not in sys.argv:
-    #app.wsgi_app = LoggingMiddleware(app.wsgi_app)
+    # app.wsgi_app = LoggingMiddleware(app.wsgi_app)
     app.wsgi_app = ScriptNameEdit(app.wsgi_app)
 
 if __name__ == "__main__":
