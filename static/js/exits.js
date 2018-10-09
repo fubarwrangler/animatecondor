@@ -11,6 +11,7 @@ class ExitJob {
     this.color = getColor(experiment);
     this.alpha = 1.0;
     this.done = false;
+    this.width = 0.8;
     this.duration = (Math.random() * 1.0) + 2.0;
     this.tweens = [];
   }
@@ -20,7 +21,7 @@ class ExitJob {
     ctx.closePath();
     this.color[3] = this.alpha;
     ctx.strokeStyle = colorStr.apply(null, this.color);
-    ctx.lineWidth = 1.2 * CScale;
+    ctx.lineWidth = this.width * CScale;
     ctx.stroke();
   }
 }
@@ -42,7 +43,7 @@ function addNewExits()  {
 }
 
 function createExitAnimation(j) {
-  slide = new TWEEN.Tween(j, exitTweens).to({y: j.y + 0.005, r: 10, alpha: 0.1}, j.duration*1000);
+  slide = new TWEEN.Tween(j, exitTweens).to({y: j.y + 0.005, r: 10, alpha: 0.1, width: 2.2}, j.duration*1000);
   slide.onComplete(jobCleanup(j));
   slide.easing(TWEEN.Easing.Quadratic.In);
   j.tweens.push(slide);
@@ -52,6 +53,11 @@ function createExitAnimation(j) {
 
 function removeFinishedExits()  {
   runningExits = runningExits.filter(job => !job.done);
+}
+
+function clearExits()  {
+  // runningExits = [];
+  exitJobs = [];
 }
 
 

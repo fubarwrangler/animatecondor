@@ -73,6 +73,11 @@ function removeFinishedStarts()  {
   runningStarts = runningStarts.filter(job => !job.done);
 }
 
+function clearStarts()  {
+  // runningStarts = [];
+  startJobs = [];
+}
+
 
 function animateStarts(ctx)  {
   addNewStarts();

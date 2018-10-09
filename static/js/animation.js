@@ -2,7 +2,7 @@
 var Fields = Object.freeze({TYPE: 0, EXP: 1, TIME: 2, NODE: 3, X: 4, Y: 5});
 var JTypes = Object.freeze({START: 0, EXIT: 1, EVICT: 2});
 var thisStart = 0;
-var DT = 20;
+var DT = 15;
 
 function getData(dt) {
   let urls = [
@@ -12,7 +12,7 @@ function getData(dt) {
   ]; // index here is defined in template based on debug, last one is production
   $.get($SCRIPT_ROOT + urls[data_url_type], (data) => {
     thisStart = Date.now();
-    console.log(thisStart, " Got ", data.length, " more");
+    // console.log(thisStart, " Got ", data.length, " more");
     createStartPoints(data.filter(r => r[0] == JTypes.START));
     createExitPoints(data.filter(r => r[0] == JTypes.EXIT));
   });
@@ -70,19 +70,42 @@ function createExitPoints(rawdata) {
   });
 }
 
+var current_frame = null;
+var current_refresh = null;
+var nf = 0;
 
 function draw() {
   ctx = canvas.getContext('2d');
   ctx.clearRect(0,0,CW,CH);
   animateStarts(ctx);
   animateExits(ctx);
-  requestAnimationFrame(draw);
+  nf++;
+  current_frame = requestAnimationFrame(draw);
 }
 
 function update() {
-  getData(DT);
-  setTimeout(update, DT * 1000);
+  if(!document.hidden)  {
+    getData(DT);
+    current_refresh = setTimeout(update, DT * 1000);
+  }
 }
+
+$(document).on('visibilitychange', () => {
+  if(document.hidden) {
+    if(current_frame) {
+      cancelAnimationFrame(current_frame);
+    }
+    if(current_refresh) {
+      clearTimeout(current_refresh);
+    }
+  } else {
+    clearStarts();
+    clearExits();
+    update();
+    draw();
+  }
+});
+
 
 function counterHz(poll) {
   let now = Date.now();
@@ -100,8 +123,10 @@ function counter() {
   setTimeout(counter, 1000);
 }
 
-//$('#overlay').on('click', () => { counterHz(5); });
+$('#overlay').on('click', () => { console.log(nf); });
 
-update();
-draw();
+$(document).ready(() => {
+  update();
+  draw();
+});
 // counter();
