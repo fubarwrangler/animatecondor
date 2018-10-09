@@ -21,19 +21,21 @@ class StartJob {
     this.t = 0;
     this.end_x = x;
     this.end_y = y;
-    this.r = 2.7;
-    this.color = colorStr.apply(null, getColor(experiment));
+    this.r = 1.7;
+    this.alpha = 0.4;
+    this.color = getColor(experiment);
     this.done = false;
-    this.duration = (Math.random() * 3.0) + 1.8;
-    dist = (Math.hypot((this.x-this.end_x), (this.y-this.end_y)) * 2);
-    this.duration /= dist;
+    this.duration = 4.0 + (Math.random() * 2.0);
+    dist = (Math.hypot((this.x-this.end_x), (this.y-this.end_y)));
+    this.duration *= dist;
     this.tweens = [];
   }
   draw(ctx, dt)  {
     ctx.beginPath();
+    this.color[3] = this.alpha;
     ctx.arc(this.x * CW, this.y * CH, this.r * CScale, 0, Math.PI * 2, true);
     ctx.closePath();
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = colorStr.apply(null, this.color);
     ctx.fill();
   }
 }
@@ -54,9 +56,9 @@ function addNewStarts()  {
 }
 
 function createStartAnimation(j) {
-  flyover = new TWEEN.Tween(j, startTweens).to({x: j.end_x, y: j.end_y}, j.duration *1000);
-  popradius = new TWEEN.Tween(j, startTweens).to({r: 5.1}, 500);
-  shrinkradius = new TWEEN.Tween(j, startTweens).to({r: 0.01}, 300);
+  flyover = new TWEEN.Tween(j, startTweens).to({x: j.end_x, y: j.end_y, alpha: 1.0, r: 2.7}, j.duration *1000);
+  popradius = new TWEEN.Tween(j, startTweens).to({r: 5.1, alpha: 0.7}, 500);
+  shrinkradius = new TWEEN.Tween(j, startTweens).to({r: 0.01, alpha: 0.1}, 300);
   shrinkradius.onComplete(jobCleanup(j));
   flyover.easing(TWEEN.Easing.Sinusoidal.InOut);
   // flyover.easing(TWEEN.Easing.Quadratic.InOut);
