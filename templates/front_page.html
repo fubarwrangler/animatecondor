@@ -12,9 +12,13 @@
   {{ macros.js('rackclick.js') }}
   {% else %}
   {{ macros.js('canvas.js') }}
+  {% if debug == 'dots' %}
+  {{ macros.js('dots.js') }}
+  {% else %}
   {{ macros.js('starts.js') }}
   {{ macros.js('exits.js') }}
   {{ macros.js('animation.js') }}
+  {% endif %}
   {% endif %}
 {%- endblock %}
 {% block body %}

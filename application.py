@@ -46,6 +46,11 @@ def front_page():
     return render_template('front_page.html', debug=app.config['DEBUG'])
 
 
+@app.route('/drawracks')
+def dot_racks():
+    return render_template('front_page.html', debug='dots')
+
+
 def machine_location(node):
     m = rack_data.get(node, None)
     if m:
@@ -82,7 +87,7 @@ def get_events(ago):
         tm = int(uxt - ts + ago)
         r = machine_location(node)
         if r:
-            data.append(['start', src, tm, node, round(r.x, 5), round(r.y, 5)])
+            data.append([EVENTS['start'], src, tm, node, round(r.x, 5), round(r.y, 5)])
 
     for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
         src, slot, node, event = loc.split(':')
