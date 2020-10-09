@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import random
 
 
@@ -31,4 +32,4 @@ class JobGen(object):
 
 if __name__ == '__main__':
     g = JobGen([0.1, 0.5])
-    print '\n'.join(map(str, g.make_list([(0.18, 0.05), (4, 2)], 30)))
+    print('\n'.join(map(str, g.make_list([(0.18, 0.05), (4, 2)], 30))))

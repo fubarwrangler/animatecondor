@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, Response
+from flask import Flask, render_template, request, jsonify, Response, g
 from sqlalchemy import or_
 import re
 import time
@@ -14,21 +14,24 @@ app.config.from_pyfile('test.cfg')
 app.config.from_envvar('FLASK_CFG', silent=True)
 app.config['JSON_SORT_KEYS'] = False
 
-import views                    # noqa
 from models import db_session   # noqa
 from models import Rack, Machine         # noqa
 
-R = redis.from_url(app.config['REDIS_URL'])
+R = redis.from_url(app.config['REDIS_URL'], decode_responses=True)
 ts = 0
 rack_data = {}
+rdatarefresh = 0
 EVENTS = {'start': 0, 'exit': 1, 'evict': 2}
 
 
-@app.before_first_request
+@app.before_request
 def refresh_dbdata():
-    global rack_data
-    for m in Machine.query.all():
-        rack_data[m.node] = m
+    global rack_data, rdatarefresh
+    g.now = time.time()
+    if g.now - rdatarefresh > 600:
+        rdatarefresh = g.now
+        for m in Machine.query.all():
+            rack_data[m.node] = m
 
 
 @app.teardown_appcontext
@@ -79,18 +82,18 @@ def get_events(ago):
         else:
             ts += ago
     else:
-        ts = time.time()*1000.
+        ts = g.now*1000.
 
     data = []
     for loc, uxt in R.zrangebyscore('starts', (ts - ago), ts, withscores=True):
-        src, slot, node = loc.split(':')
+        src, _, node = loc.split(':')
         tm = int(uxt - ts + ago)
         r = machine_location(node)
         if r:
             data.append([EVENTS['start'], src, tm, node, round(r.x, 5), round(r.y, 5)])
 
     for loc, uxt in R.zrangebyscore('exits', (ts - ago), ts, withscores=True):
-        src, slot, node, event = loc.split(':')
+        src, _, node, event = loc.split(':')
         tm = int(uxt - ts + ago)
         r = machine_location(node)
         if r:

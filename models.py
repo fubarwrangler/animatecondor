@@ -18,7 +18,6 @@ Base.query = db_session.query_property()
 
 
 def init_db():
-    import racks  # flake8: noqa -- to register models
     Base.metadata.create_all(bind=engine)
 
 
@@ -37,6 +36,7 @@ class Rack(Base):
     def __repr__(self):
         return '<Rack %d-%d @ %x>' % (self.row, self.rack, id(self))
 
+
 class Machine(Base):
     __tablename__ = 'machines'
 
@@ -45,11 +45,15 @@ class Machine(Base):
     rack = Column(Integer)
     robj = relationship("Rack", primaryjoin='and_(Machine.rack==Rack.rack, Machine.row==Rack.row)', foreign_keys='[Rack.rack, Rack.row]', lazy='joined', uselist=False)
 
-
     __table_args__ = ({'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'})
+
     def __repr__(self):
         return '<Machine %s (%d-%d) @ %x>' % (self.node, self.row, self.rack, id(self))
 
     @property
     def rstr(self):
         return '%d-%d' % (self.row, self.rack)
+
+
+if __name__ == "__main__":
+    init_db()
